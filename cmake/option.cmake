@@ -13,6 +13,8 @@ option(ENABLE_SAPPHIRERAPIDS "Enable Intel Sapphire Rapids Server CPU microarchi
 option(ENABLE_EMERALDRAPIDS "Enable Intel Emerald Rapids Server CPU microarchitecture" OFF)
 option(ENABLE_GRANITERAPIDS "Enable Intel Granite Rapids Server CPU microarchitecture" OFF)
 
+option(X86_ARCH_NATIVE "Build with -march=native" OFF)
+
 ## AMD Microarchitectures
 option(ENABLE_ZEN1 "Enable AMD Zen+ Family 17h CPU microarchitecture" OFF)
 option(ENABLE_ZEN2 "Enable AMD Zen 2 Family 17h CPU microarchitecture" OFF)
@@ -89,12 +91,16 @@ function(_detect_armv8_best)
 endfunction()
 
 function(_detect_x86_best)
-  set(_x86_flags
-    "graniterapids" "emeraldrapids" "sapphirerapids"
-    "skylake-avx512" "skylake"
-    "broadwell" "haswell" "sandybridge" "nehalem"
-    "znver3" "znver2" "znver1"
-  )
+  if(X86_ARCH_NATIVE)
+    set(_x86_flags "native")
+  else()
+    set(_x86_flags
+      "graniterapids" "emeraldrapids" "sapphirerapids"
+      "skylake-avx512" "skylake"
+      "broadwell" "haswell" "sandybridge" "nehalem"
+      "znver3" "znver2" "znver1"
+    )
+  endif()
   foreach(_arch IN LISTS _x86_flags)
     check_c_compiler_flag("-march=${_arch}" _COMP_SUPP_${_arch})
     if(_COMP_SUPP_${_arch})
